@@ -26,7 +26,7 @@ import logging
 logging.basicConfig(level = logging.DEBUG)
 log = logging.getLogger('ctabustracker')
 
-# Utility functions. May want to make these public?
+# Utility methods
 def convert_time(timestring):
     """
     Converts a CTA time stamp from XML into a
@@ -38,7 +38,6 @@ def convert_time(timestring):
         # For some reason, the API supports seconds in some places,
         # and not elsewhere.
         return time.strptime(timestring, "%Y%m%d %H:%M")
-
 
 
 class ctabustracker:
@@ -105,7 +104,11 @@ class ctabustracker:
 
         log.debug("Generated URL: "+ url)
 
-        return self.__get_http_response(url)
+        log_http_time = time.time()
+        response = self.__get_http_response(url)
+        log.info("API response time: " + str(time.time() - log_http_time))
+        return response
+
 
     def gettime(self):
         """
@@ -176,29 +179,10 @@ class ctabustracker:
                             route = vehicle.find('rt').text, \
                             dest = vehicle.find('des').text, \
                             delayed = delayed)
-
-
-#             v_obj = Vehicle()
-#             v_obj.vehicle_id = str(vehicle.find('vid').text)
-#             v_obj.timestamp = self.__convert_time(vehicle.find('tmstmp').text)
-#             v_obj.lat = float(vehicle.find('lat').text)
-#             v_obj.long = float(vehicle.find('lon').text)
-#             v_obj.heading = int(vehicle.find('hdg').text)
-#             v_obj.pattern_id = int(vehicle.find('pid').text)
-#             v_obj.pattern_distance = int(vehicle.find('pdist').text)
-#             v_obj.route = str(vehicle.find('rt').text)
-#             v_obj.dest = str(vehicle.find('des').text)
-            # This element will only exist if the bus is delayed
-#            try:
-#                vehicle.find('dly').text
-#            except AttributeError:
-#                 v_obj.delayed = False
-#             else:
-#                 v_obj.delayed = True
-#             # Append it to the vehicles list
+            # Append it to the vehicles list
             vehicles.append(v_obj)
 
-        log.debug("XML Processing time for getvehicles_vid(): " + str(time.time() - debug_start_time))
+        log.info("XML Processing time for getvehicles_vid(): " + str(time.time() - debug_start_time))
         return vehicles
 
     def getvehicles_rt(self, *routes):
@@ -225,30 +209,28 @@ class ctabustracker:
 
         vehicles = list()
         for vehicle in vehicles_xml:
-            # Create an empty vehicle object
-            v_obj = Vehicle()
-            v_obj.vehicle_id = str(vehicle.find('vid').text)
-            # XXX to fix: this only is granular to minutes
-
-            v_obj.timestamp = self.__convert_time(vehicle.find('tmstmp').text)
-            v_obj.lat = float(vehicle.find('lat').text)
-            v_obj.long = float(vehicle.find('lon').text)
-            v_obj.heading = int(vehicle.find('hdg').text)
-            v_obj.pattern_id = int(vehicle.find('pid').text)
-            v_obj.pattern_distance = int(vehicle.find('pdist').text)
-            v_obj.route = str(vehicle.find('rt').text)
-            v_obj.dest = str(vehicle.find('des').text)
-            # This element will only exist if the bus is delayed
+            # Yank the delay flag out
             try:
                 vehicle.find('dly').text
             except AttributeError:
-                v_obj.delayed = False
+                delayed = False
             else:
-                v_obj.delayed = True
-            # Append it to the vehicles list
+                delayed = True
+            # Create an empty vehicle object
+            v_obj = Vehicle(vehicle_id = vehicle.find('vid').text, \
+                            timestamp = vehicle.find('tmstmp').text, \
+                            lat = vehicle.find('lat').text, \
+                            long = vehicle.find('lon').text, \
+                            heading = vehicle.find('hdg').text, \
+                            pattern_id = vehicle.find('pid').text, \
+                            pattern_distance = vehicle.find('pdist').text, \
+                            route = vehicle.find('rt').text, \
+                            dest = vehicle.find('des').text, \
+                            delayed = delayed)
+
             vehicles.append(v_obj)
 
-        log.debug("XML Processing time for getvehicles_rt(): " + str(time.time() - debug_start_time))
+        log.info("XML Processing time for getvehicles_rt(): " + str(time.time() - debug_start_time))
         return vehicles
 
     def getroutes(self):
@@ -319,27 +301,234 @@ class ctabustracker:
         if (len(patternids) > 10):
             raise ImproperNumberOfItemsException(len(patternids))
 
-            
-
         pid_query_string = str()
         for pid in patternids:
             pid_query_string = pid_query_string + str(pid) + ", "
         pid_query_string.rstrip(",")
 
-        querydict = {"stpid": pid_query_string}
+        querydict = {"pid": pid_query_string}
 
         api_result = self.__get_api_response("getpatterns", querydict)
 
-        pass
+        root = etree.fromstring(api_result)
 
-    def getpatterns_rt(self, route):
+        patterns = list()
+        patterns_xml = root.findall('ptr')
+
+        for pattern in patterns_xml:
+            pat_obj = Pattern(pattern_id = pattern.find('pid').text, \
+                              length = pattern.find('ln').text,
+                              direction = pattern.find('rtdir').text)
+            for point in pattern.findall('pt'):
+                if (point.find('stpid') != None):
+                    stop_id = point.find('stpid').text
+                else:
+                    stop_id = None
+                if (point.find('stpnm') != None):
+                    stop_name = point.find('stpnm').text
+                else:
+                    stop_name = None
+                if (point.find('pdist') != None):
+                    pattern_distance = point.find('pdist').text
+                else:
+                    pattern_distance = None
+                    
+                point_obj = Point(seq = point.find('seq').text, \
+                                  ptype = point.find('typ').text, \
+                                  lat = point.find('lat').text, \
+                                  long = point.find('lon').text, \
+                                  stop_id = stop_id,\
+                                  stop_name = stop_name,\
+                                  pattern_distance = pattern_distance)
+                pat_obj.append(point_obj)
+            patterns.append(pat_obj)
+        return patterns
+
+    def getpatterns_rt(self, route, direction):
         """
-        Returns a single pattern given a route
+        Returns a single pattern given a route and direction
         """
-        pass
+        # TODO: sanitize direction
+        route = str(route)
+        querydict = {"rt": route, "dir": direction}
+
+        api_result = self.__get_api_response("getpatterns", querydict)
+
+        root = etree.fromstring(api_result)
+
+        patterns = list()
+        patterns_xml = root.findall('ptr')
+
+        for pattern in patterns_xml:
+            pat_obj = Pattern(pattern_id = pattern.find('pid').text, \
+                              length = pattern.find('ln').text,
+                              direction = pattern.find('rtdir').text)
+            for point in pattern.findall('pt'):
+                if (point.find('stpid') != None):
+                    stop_id = point.find('stpid').text
+                else:
+                    stop_id = None
+
+                if (point.find('stpnm') != None):
+                    stop_name = point.find('stpnm').text
+                else:
+                    stop_name = None
+
+                if (point.find('pdist') != None):
+                    pattern_distance = point.find('pdist').text
+                else:
+                    pattern_distance = None
+                    
+                point_obj = Point(seq = point.find('seq').text, \
+                                  ptype = point.find('typ').text, \
+                                  lat = point.find('lat').text, \
+                                  long = point.find('lon').text, \
+                                  stop_id = stop_id,\
+                                  stop_name = stop_name,\
+                                  pattern_distance = pattern_distance)
+                pat_obj.append(point_obj)
+            patterns.append(pat_obj)
+        return patterns
+
+    def getpredictions_stop(self, *stop_ids):
+        """
+        Returns predictions for the given stop_ids. 
+        """
+        if (len(stop_ids) > 10 or len(stop_ids) < 1):
+            raise ImproperNumberOfItemsException(len(stop_ids))
 
 
+        stop_ids_str = str()
+        for stop in stop_ids:
+            stop_ids_str = stop_ids_str + str(stop) + ","
+        stop_ids_str = stop_ids_str.rstrip(",")
 
+
+        querydict = {"stpid":stop_ids_str}
+        api_result = self.__get_api_response("getpredictions", querydict)
+
+        root = etree.fromstring(api_result)
+
+        predictions = list()
+
+        predictions_xml = root.findall('prd')
+
+        predictions_list = list()
+        for prediction in predictions_xml:
+            pred_obj = Prediction(timestamp = prediction.find('tmstmp').text,
+                                  prediction_type = prediction.find('typ').text,
+                                  stop_id = prediction.find('stpid').text,
+                                  stop_name = prediction.find('stpnm').text,
+                                  vehicle_id = prediction.find('vid').text,
+                                  distance_to_stop = prediction.find('dstp').text,
+                                  route = prediction.find('rt').text,
+                                  route_dir = prediction.find('rtdir').text,
+                                  destination = prediction.find('des').text,
+                                  predicted_eta = prediction.find('prdtm').text)
+            if (prediction.find('dly') != None):
+                pred_obj.delayed = True
+
+            predictions_list.append(pred_obj)
+
+        return predictions_list
+
+    def getpredictions_vehicle(self, *vehicle_ids):
+        """
+        Returns predictions for the given vehicle_ids
+        """
+
+        if (len(vehicle_ids) > 10 or len(vehicle_ids) < 1):
+            raise ImproperNumberOfItemsException(len(vehicle_ids))
+
+        vehicle_ids_str = str()
+        for vehicle_id in vehicle_ids:
+            vehicle_ids_str = vehicle_ids_str + str(vehicle_id) + ","
+        vehicle_ids_str = vehicle_ids_str.rstrip(",")
+
+        querydict = {"vid":vehicle_ids_str}
+
+        api_result = self.__get_api_response("getpredictions", querydict)
+                                                   
+        root = etree.fromstring(api_result)
+
+        predictions = list()
+
+        predictions_xml = root.findall('prd')
+
+        predictions_list = list()
+        for prediction in predictions_xml:
+            pred_obj = Prediction(timestamp = prediction.find('tmstmp').text,
+                                  prediction_type = prediction.find('typ').text,
+                                  stop_id = prediction.find('stpid').text,
+                                  stop_name = prediction.find('stpnm').text,
+                                  vehicle_id = prediction.find('vid').text,
+                                  distance_to_stop = prediction.find('dstp').text,
+                                  route = prediction.find('rt').text,
+                                  route_dir = prediction.find('rtdir').text,
+                                  destination = prediction.find('des').text,
+                                  predicted_eta = prediction.find('prdtm').text)
+            if (prediction.find('dly') != None):
+                pred_obj.delayed = True
+
+            predictions_list.append(pred_obj)
+
+        return predictions_list
+
+    def getbulletins_route(self, *routes):
+        """
+        Gets bulletins related to routes, and the given
+        direction (if any)
+        """
+
+        if (len(routes) > 10 or len(routes) < 1):
+            raise ImproperNumberOfItemsException(len(routes))
+
+        routes_str = str()
+
+        for route in routes:
+            routes_str += str(route) + ","
+        routes_str.rstrip(",")
+
+        querydict = {'rt':routes_str}
+
+        api_result = self.__get_api_response("getservicebulletins", querydict)
+
+        root = etree.fromstring(api_result)
+
+        bulletins_xml = root.findall('sb')
+
+        bulletins_list = list()
+
+        for bulletin in bulletins_xml:
+            bulletin_obj = Service_Bulletin(name = bulletin.find('nm').text,
+                                            subject = bulletin.find('sbj').text,
+                                            detail = bulletin.find('dtl').text,
+                                            brief = bulletin.find('brf').text,
+                                            priority = bulletin.find('prty').text)
+            for sb in bulletin.findall('srvc'):
+                route = None
+                direction = None
+                stop_num = None
+                stop_name = None
+
+
+                if (sb.find('rt') != None):
+                    route = sb.find('rt').text
+                if (sb.find('rtdir') != None):
+                    direction = sb.find('rtdir').text
+                if (sb.find('stpid') != None):
+                    stop_num = sb.find('stpid').text
+                if (sb.find('stpnm') != None):
+                    stop_name = sb.find('stpnm').text
+                    
+                bulletin_obj.append(route = route,
+                                    direction = direction,
+                                    stop_num = stop_num,
+                                    stop_name = stop_name)
+
+            bulletins_list.append(bulletin_obj)
+
+        return bulletins_list
 
         
 # BusTrackerObjects
@@ -436,18 +625,14 @@ class Stop:
     # Longitude
     long = float()
 
-    def __init__(self, stop_id = None, stop_name = None, lat = None, long = None):
+    def __init__(self, stop_id, stop_name, lat, long):
         """
         Creates a Route object
         """
-        try:
-            self.stop_id = int(stop_id)
-            self.stop_name = str(stop_name)
-            self.lat = str(lat)
-            self.long = str(long)
-        except TypeError:
-            # Expected - probably was passed in nothing.
-            pass
+        self.stop_id = int(stop_id)
+        self.stop_name = str(stop_name)
+        self.lat = str(lat)
+        self.long = str(long)
 
         return
 
@@ -465,10 +650,54 @@ class Pattern:
     """
     A Pattern is a series of Points and related metadata.
     """
-    pass
+    
+    # List of points (waypoints and stops)
+    points = list()
+
+    # ID of this pattern
+    pattern_id = int()
+
+    # Length of this pattern (in feet)
+    length = int()
+
+    # Direction this pattern travels in
+    direction = str()
+
+    def append(self, point):
+        """
+        Appends a point to this pattern
+        """
+        # TODO: Might want to have this sort out the points every time?
+        self.points.append(point)
+        return
 
 
-class Point:
+    def __init__(self, pattern_id, length, direction, points = None):
+        """
+        Defines a patern. points can be a list of points, or None.
+        """
+        self.pattern_id = int(pattern_id)
+        self.length = int(float(length)) # The API spec says this an int, but returns a float.
+        self.direction = str(direction)
+        if (points != None):
+            for point in points:
+                self.append(points)
+
+        return
+
+    def __str__(self):
+
+        point_str = "Pattern ID: " + str(self.pattern_id) + \
+                "\nLength: " + str(self.length) + \
+                "\nDirection: " + str(self.direction) + \
+                "\nPoints:\n"
+        for point in self.points:
+            point_str += str(point)
+
+        return point_str
+
+
+class Point(Stop):
     """
     A point is a geographic coordinate, direction, and
     related metadata. Many Points make up a Pattern.
@@ -477,48 +706,224 @@ class Point:
     # Position of this point relative to other points in a pattern
     seq = int()
 
-    # ptype - W = Waypoint, S = stop.
+    # ptype - Waypoint or Stop.
     ptype = str()
-
-    # stop_id - stop ID number
-    stop_id = int()
-
-    # stop_name - stop name
-    stop_name = str()
 
     # pattern_distance - distance from start in pattern
     pattern_distance = float()
 
-    # lat - Latitude
-    lat = float()
+    def __handle_pattern_type(self, ptype):
+        if ptype == "W":
+            return "Waypoint"
+        elif ptype == "S":
+            return "Stop"
+        else:
+            return ptype
 
-    # long - longitude
-    long = float()
-
-    def __init__(seq = None, ptype = None, stop_id = None, stop_name = None, pattern_distance = None, lat = None, long = None):
+    def __init__(self, seq, ptype, lat, long, stop_id = None, stop_name = None, pattern_distance = None):
         """
-        Constructor.  Any of the given parameters can be empty.
+        Constructor for Point.
         """
-        # TODO - Test this! I'm not sure if this will actually populate everything
-        # if something turns out to be None.
-        try:
-            self.seq = int(seq)
-            self.ptype = str(seq)
+        self.seq = int(seq)
+        self.ptype = self.__handle_pattern_type(ptype)
+        if (stop_id != None):
             self.stop_id = str(stop_id)
+        else:
+            self.stop_id = None
+        if (stop_name != None):
             self.stop_name = str(stop_name)
-            self.pattern_distance = float(pattern_distance)
-            self.lat = float(lat)
-            self.long = float(long)
-        except TypeError:
-            passs
+        else:
+            self.stop_id = None
 
-    pass
+        if (pattern_distance != None):
+            self.pattern_distance = float(pattern_distance)
+        else:
+            self.pattern_distance = None
+        self.lat = float(lat)
+        self.long = float(long)
+        return
+
+class Prediction:
+    """
+    A prediction is an object holding when a bus is scheduled to arrive at a given stop.
+    """
+
+    # timestamp is when this prediction was taken
+    timestamp = None
+
+    # Type is "A" (arrival) or "D" (departure)
+    prediction_type = str()
+
+    # stop_id is the stop number
+    stop_id = int()
+
+    # stop_name is the stop's name
+    stop_name = str()
+
+    # vehicld_id is the vehicle's ID #
+    vehicle_id = int()
+
+    # distance_to_stop is the distance the bus needs to travel before it hits
+    # this stop (in feet)
+    distance_to_stop = int()
+
+    # route is the route of this prediction
+    route = str()
+
+    # route_dir is the direction the bus is going on this route
+    route_dir = str()
+
+    # destination is the final destination of this vehicle
+    destination = str()
+
+    # predicted_eta is the time that the bus is scheduled to arrive
+    predicted_eta = None
+
+    # delayed is True if the vehicle is delayed.
+    delayed = bool()
+
+    def __init__(self, timestamp, prediction_type, stop_id, stop_name, vehicle_id, distance_to_stop, route, route_dir, destination, predicted_eta, delayed = False):
+        self.timestamp  = convert_time(timestamp)
+        self.prediction_type = str(prediction_type)
+        self.stop_id = int(stop_id)
+        self.stop_name = str(stop_name)
+        self.vehicle_id = int(vehicle_id)
+        self.distance_to_stop = int(distance_to_stop)
+        self.route = str(route)
+        self.route_dir = str(route_dir)
+        self.destination = str(destination)
+        self.predicted_eta = convert_time(predicted_eta)
+        self.delayed = bool(delayed)
+        return
+
+    def __str__(self):
+        return "PREDICTION:\n"+\
+                "Prediction generated at: " + time.asctime(self.timestamp) + "\n" +\
+                "Type: " + self.prediction_type + "\n" +\
+                "Route: " + str(self.route) + "\n" +\
+                "Direction: " + str(self.route_dir) + "\n" +\
+                "Route destination: " + self.destination + "\n" +\
+                "Stop number: " + str(self.stop_id) + "\n" +\
+                "Stop name: " + self.stop_name + "\n" +\
+                "Vehicle number:  " + str(self.vehicle_id) + "\n" +\
+                "Distance away: " + str(self.distance_to_stop) + "\n" +\
+                "Estimated time of arrival: " + time.asctime(self.predicted_eta)
+
+class Service_Bulletin:
+    """"
+    Contains a service bulletin object.
+    """
+
+    # name - Unique name identifier of the service bulletin.
+    # XXX The example XML doesn't have this, but the CTA schema says it's 
+    # required!
+    name = str()
+
+    # subject - Bulletin subject
+    subject = str()
+
+    # Detail - Details about the bulletin.
+    detail = str()
+
+    # Brief - A brief alternative to detail (these will often be the same)
+    brief = str()
+
+    # priority - The priority of this bulletin.
+    priority = str()
+
+    # affected_services - a list of SB_Service objects that are affected by
+    # this bulletin.  If this list is empty, this bulletin affects
+    # all CTA services.
+    affected_services = list()
+
+    def append(self, stop_name, route = None, direction = None, stop_num = None):
+        """
+        Appends an SB_Service object to this bulletin
+        """
+        log.debug("Route in append: " + str(route))
+        log.debug("direction in append: " + str(direction))
+        new_sb = SB_Service(route = route,
+                            direction = direction,
+                            stop_num = stop_num,
+                            stop_name = stop_name)
+        self.affected_services.append(new_sb)
+        return
+
+    def __init__(self, name, subject, detail, brief, priority, affected_services = []):
+        self.name = str(name)
+        self.subject = str(subject)
+        self.detail = str(detail)
+        self.brief = str(brief)
+        self.priority = str(priority)
+
+        return
+
+    def __str__(self):
+        return_str = "SERVICE BULLETIN:\n" +\
+                "Name: " + str(self.name) + "\n" +\
+                "Subject: " + str(self.subject) + "\n" +\
+                "Detail: " + str(self.detail) + "\n" +\
+                "Brief: " + str(self.brief) + "\n" +\
+                "Priority: " + str(self.priority) + "\n"
+
+        for service in self.affected_services:
+            return_str += (str(service))
+            
+        return return_str
+
+class SB_Service:
+    """
+    Service bulletin data for bulletins that affect only a certain subset
+    of the system
+    """
+
+    # route - route number affected. 
+    route = str()
+
+    # direction - direction affected
+    direction = str()
+
+    # stop_num - stop number affected
+    stop_num = int()
+
+    # stop_name - stop name affected
+    stop_name = int()
+
+    def __init__(self, stop_name, route = None, direction = None, stop_num = None):
+        # Yes, that's how the spec has it defined. This is wacky.
+        # Why would ONLY the stop name be defined?
+
+        log.debug("route in init: " + str(route))
+
+        if (route != None):
+            self.route = str(route)
+        else:
+            self.route = None
+
+        if (direction != None):
+            self.direction = str(direction)
+        else:
+            self.direction = None
+
+        if (stop_num != None):
+            self.stop_num = int(stop_num)
+        else:
+            self.stop_num = None
+
+        self.stop_name = str(stop_name)
+
+    def __str__(self):
+        return "AFFECTED SERVICE:\n" +\
+                "Route number: " + str(self.route) + "\n" +\
+                "Route direction: " + str(self.direction) + "\n" +\
+                "Stop number: " + str(self.stop_num)  + "\n" +\
+                "Stop name: " + str(self.stop_name) + "\n"
 
 # EXCEPTION DEFINITIONS
 
 class Error(Exception):
     """Base class for exceptions in this module."""
-    pass
+    pass 
 
 class ImproperNumberOfItemsException(Error):
     """
