@@ -476,8 +476,7 @@ class ctabustracker:
 
     def getbulletins_route(self, *routes):
         """
-        Gets bulletins related to routes, and the given
-        direction (if any)
+        Gets bulletins related to routes.
         """
 
         if (len(routes) > 10 or len(routes) < 1):
@@ -530,6 +529,62 @@ class ctabustracker:
 
         return bulletins_list
 
+    def getbulletins_stops(self, *stopids):
+        """
+        Gets bulletins related to given stop ids. 
+        """
+
+        # The spec doesn't list a maximum, but I'm going to presume
+        # it's still 10.
+        if (len(stopids) > 10 or len(stopids) < 1):
+            raise ImproperNumberOfItemsException(len(stopids))
+
+        stopids_str = str()
+
+        for stop in stopids:
+            stopids_str += str(stop) + ","
+        stopids_str.rstrip(",")
+
+        querydict = {'rt':stopids_str}
+
+        api_result = self.__get_api_response("getservicebulletins", querydict)
+
+        root = etree.fromstring(api_result)
+
+        bulletins_xml = root.findall('sb')
+
+        bulletins_list = list()
+
+        for bulletin in bulletins_xml:
+            bulletin_obj = Service_Bulletin(name = bulletin.find('nm').text,
+                                            subject = bulletin.find('sbj').text,
+                                            detail = bulletin.find('dtl').text,
+                                            brief = bulletin.find('brf').text,
+                                            priority = bulletin.find('prty').text)
+            for sb in bulletin.findall('srvc'):
+                route = None
+                direction = None
+                stop_num = None
+                stop_name = None
+
+
+                if (sb.find('rt') != None):
+                    route = sb.find('rt').text
+                if (sb.find('rtdir') != None):
+                    direction = sb.find('rtdir').text
+                if (sb.find('stpid') != None):
+                    stop_num = sb.find('stpid').text
+                if (sb.find('stpnm') != None):
+                    stop_name = sb.find('stpnm').text
+                    
+                bulletin_obj.append(route = route,
+                                    direction = direction,
+                                    stop_num = stop_num,
+                                    stop_name = stop_name)
+
+            bulletins_list.append(bulletin_obj)
+
+        return bulletins_list
         
 # BusTrackerObjects
 
@@ -544,7 +599,9 @@ class Vehicle:
     """
     vehicle_id = int()
 
+    #
     # Time information was obtained
+    #
     timestamp = None
 
     # Latitude position of the vehicle
@@ -553,9 +610,7 @@ class Vehicle:
     # Longitude position of the vehicle
     long = float()
 
-    # Direction vehicle is heading
-    # TODO: Define constants to these (though these are
-    # degree-based, with 0 being north)
+    # Direction vehicle is heading (in degrees, 0 meaning North)
     heading = int()
 
     # Pattern ID of trip (see getpatterns)
@@ -782,6 +837,26 @@ class Prediction:
     # delayed is True if the vehicle is delayed.
     delayed = bool()
 
+    def estimated_time_to_arrival(self, ctatime = None):
+        """
+        Returns the time that the bus is expected to arrive for this 
+        Prediction (in minutes).
+
+        If ctatime is unspecified, returns ETA based on the system's clock,
+        otherwise, matches difference against specified time.
+        """
+
+        if (ctatime == None):
+            ctatime = time.localtime()
+
+        elif (type(ctatime) == str):
+            # Presuming this is a human-readable time string as 
+            # returned from the API
+            ctatime == convert_time(ctatime)
+
+        eta_seconds = time.mktime(self.predicted_eta) - time.mktime(ctatime)
+        return int(eta_seconds/60)
+
     def __init__(self, timestamp, prediction_type, stop_id, stop_name, vehicle_id, distance_to_stop, route, route_dir, destination, predicted_eta, delayed = False):
         self.timestamp  = convert_time(timestamp)
         self.prediction_type = str(prediction_type)
@@ -823,9 +898,12 @@ class Service_Bulletin:
     subject = str()
 
     # Detail - Details about the bulletin.
+    # Note that this is often the only field given.  Also, note that
+    # you'll find HTML embedded in this response on a regular basis!
     detail = str()
 
     # Brief - A brief alternative to detail (these will often be the same)
+    # Or empty!
     brief = str()
 
     # priority - The priority of this bulletin.
