@@ -1,0 +1,565 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module ctabustracker</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>ctabustracker</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/chris/Projects/cta/ctabustracker/ctabustracker.py">/Users/chris/Projects/cta/ctabustracker/ctabustracker.py</a></font></td></tr></table>
+    <p><tt><a href="#ctabustracker">ctabustracker</a>.py<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;Python&nbsp;module&nbsp;that&nbsp;offers&nbsp;access&nbsp;to&nbsp;all&nbsp;of&nbsp;the&nbsp;data&nbsp;available<br>
+in&nbsp;the&nbsp;CTA&nbsp;Bus&nbsp;Tracker&nbsp;API.&nbsp;&nbsp;This&nbsp;is&nbsp;based&nbsp;on&nbsp;the&nbsp;CTA&nbsp;Bus&nbsp;Tracker&nbsp;API<br>
+documentation&nbsp;v1.0/rev.2009-12-14,&nbsp;available&nbsp;at:<br>
+<a href="http://www.transitchicago.com/asset.aspx?AssetId=2917">http://www.transitchicago.com/asset.aspx?AssetId=2917</a><br>
+&nbsp;<br>
+The&nbsp;CTA&nbsp;bus&nbsp;tracker&nbsp;API&nbsp;returns&nbsp;data&nbsp;in&nbsp;XML,&nbsp;and&nbsp;this&nbsp;module&nbsp;converts<br>
+the&nbsp;information&nbsp;to&nbsp;more&nbsp;sane&nbsp;data&nbsp;structures.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;this&nbsp;does&nbsp;not&nbsp;currently&nbsp;cover&nbsp;L&nbsp;trains,&nbsp;as&nbsp;they&nbsp;do&nbsp;not&nbsp;exist&nbsp;<br>
+in&nbsp;the&nbsp;&nbsp;API&nbsp;at&nbsp;the&nbsp;time&nbsp;of&nbsp;creation&nbsp;(Jul&nbsp;2010).&nbsp;&nbsp;Rumor&nbsp;has&nbsp;it&nbsp;that&nbsp;<br>
+it's&nbsp;on&nbsp;its&nbsp;way&nbsp;soon.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="xml.etree.ElementTree.html">xml.etree.ElementTree</a><br>
+</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+</td><td width="25%" valign=top><a href="urllib2.html">urllib2</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="ctabustracker.html#Pattern">Pattern</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ctabustracker.html#Prediction">Prediction</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ctabustracker.html#SB_Service">SB_Service</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ctabustracker.html#Service_Bulletin">Service_Bulletin</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ctabustracker.html#Stop">Stop</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ctabustracker.html#Point">Point</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="ctabustracker.html#Vehicle">Vehicle</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ctabustracker.html#ctabustracker">ctabustracker</a>
+</font></dt><dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>(<a href="exceptions.html#BaseException">exceptions.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ctabustracker.html#Error">Error</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ctabustracker.html#ImproperNumberOfItemsException">ImproperNumberOfItemsException</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ctabustracker.html#InvalidParamtersException">InvalidParamtersException</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Error">class <strong>Error</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;exceptions&nbsp;in&nbsp;this&nbsp;module.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ctabustracker.html#Error">Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="Error-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0xefc40&gt;<dd><tt>T.<a href="#Error-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="Error-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="Error-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="Error-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="Error-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="Error-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="Error-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="Error-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="Error-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="Error-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="Error-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+<dl><dt><strong>message</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ImproperNumberOfItemsException">class <strong>ImproperNumberOfItemsException</strong></a>(<a href="ctabustracker.html#Error">Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="exceptions.html#Exception">Exception</a>&nbsp;raised&nbsp;for&nbsp;lists&nbsp;exceeding&nbsp;preset&nbsp;limits.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ctabustracker.html#ImproperNumberOfItemsException">ImproperNumberOfItemsException</a></dd>
+<dd><a href="ctabustracker.html#Error">Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ImproperNumberOfItemsException-__init__"><strong>__init__</strong></a>(self, numOfItems)</dt></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="ctabustracker.html#Error">Error</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0xefc40&gt;<dd><tt>T.<a href="#ImproperNumberOfItemsException-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="ImproperNumberOfItemsException-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#ImproperNumberOfItemsException-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#ImproperNumberOfItemsException-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#ImproperNumberOfItemsException-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#ImproperNumberOfItemsException-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#ImproperNumberOfItemsException-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#ImproperNumberOfItemsException-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="ImproperNumberOfItemsException-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+<dl><dt><strong>message</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="InvalidParamtersException">class <strong>InvalidParamtersException</strong></a>(<a href="ctabustracker.html#Error">Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="exceptions.html#Exception">Exception</a>&nbsp;raised&nbsp;if&nbsp;the&nbsp;parameters&nbsp;given&nbsp;to&nbsp;a&nbsp;function&nbsp;are&nbsp;incorrect.<br>
+&nbsp;<br>
+Attributes:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;msg&nbsp;-&nbsp;Message&nbsp;to&nbsp;return.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ctabustracker.html#InvalidParamtersException">InvalidParamtersException</a></dd>
+<dd><a href="ctabustracker.html#Error">Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="InvalidParamtersException-__init__"><strong>__init__</strong></a>(self, msg)</dt></dl>
+
+<dl><dt><a name="InvalidParamtersException-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="ctabustracker.html#Error">Error</a>:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0xefc40&gt;<dd><tt>T.<a href="#InvalidParamtersException-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="InvalidParamtersException-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#InvalidParamtersException-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="InvalidParamtersException-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#InvalidParamtersException-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="InvalidParamtersException-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#InvalidParamtersException-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="InvalidParamtersException-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#InvalidParamtersException-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="InvalidParamtersException-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="InvalidParamtersException-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#InvalidParamtersException-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="InvalidParamtersException-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#InvalidParamtersException-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="InvalidParamtersException-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="InvalidParamtersException-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+<dl><dt><strong>message</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Pattern">class <strong>Pattern</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;<a href="#Pattern">Pattern</a>&nbsp;is&nbsp;a&nbsp;series&nbsp;of&nbsp;Points&nbsp;and&nbsp;related&nbsp;metadata.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Pattern-__init__"><strong>__init__</strong></a>(self, pattern_id, length, direction, points<font color="#909090">=None</font>)</dt><dd><tt>Defines&nbsp;a&nbsp;patern.&nbsp;points&nbsp;can&nbsp;be&nbsp;a&nbsp;list&nbsp;of&nbsp;points,&nbsp;or&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="Pattern-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Pattern-append"><strong>append</strong></a>(self, point)</dt><dd><tt>Appends&nbsp;a&nbsp;point&nbsp;to&nbsp;this&nbsp;pattern</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>direction</strong> = ''</dl>
+
+<dl><dt><strong>length</strong> = 0</dl>
+
+<dl><dt><strong>pattern_id</strong> = 0</dl>
+
+<dl><dt><strong>points</strong> = []</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Point">class <strong>Point</strong></a>(<a href="ctabustracker.html#Stop">Stop</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;point&nbsp;is&nbsp;a&nbsp;geographic&nbsp;coordinate,&nbsp;direction,&nbsp;and<br>
+related&nbsp;metadata.&nbsp;Many&nbsp;Points&nbsp;make&nbsp;up&nbsp;a&nbsp;<a href="#Pattern">Pattern</a>.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Point-__init__"><strong>__init__</strong></a>(self, seq, ptype, lat, long, stop_id<font color="#909090">=None</font>, stop_name<font color="#909090">=None</font>, pattern_distance<font color="#909090">=None</font>)</dt><dd><tt>Constructor&nbsp;for&nbsp;<a href="#Point">Point</a>.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>pattern_distance</strong> = 0.0</dl>
+
+<dl><dt><strong>ptype</strong> = ''</dl>
+
+<dl><dt><strong>seq</strong> = 0</dl>
+
+<hr>
+Methods inherited from <a href="ctabustracker.html#Stop">Stop</a>:<br>
+<dl><dt><a name="Point-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>String&nbsp;representation&nbsp;of&nbsp;a&nbsp;<a href="#Stop">Stop</a>&nbsp;object</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ctabustracker.html#Stop">Stop</a>:<br>
+<dl><dt><strong>lat</strong> = 0.0</dl>
+
+<dl><dt><strong>long</strong> = 0.0</dl>
+
+<dl><dt><strong>stop_id</strong> = 0</dl>
+
+<dl><dt><strong>stop_name</strong> = ''</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Prediction">class <strong>Prediction</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;prediction&nbsp;is&nbsp;an&nbsp;object&nbsp;holding&nbsp;when&nbsp;a&nbsp;bus&nbsp;is&nbsp;scheduled&nbsp;to&nbsp;arrive&nbsp;at&nbsp;a&nbsp;given&nbsp;stop.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Prediction-__init__"><strong>__init__</strong></a>(self, timestamp, prediction_type, stop_id, stop_name, vehicle_id, distance_to_stop, route, route_dir, destination, predicted_eta, delayed<font color="#909090">=False</font>)</dt></dl>
+
+<dl><dt><a name="Prediction-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Prediction-estimated_time_to_arrival"><strong>estimated_time_to_arrival</strong></a>(self, ctatime<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;the&nbsp;time&nbsp;that&nbsp;the&nbsp;bus&nbsp;is&nbsp;expected&nbsp;to&nbsp;arrive&nbsp;for&nbsp;this&nbsp;<br>
+<a href="#Prediction">Prediction</a>&nbsp;(in&nbsp;minutes).<br>
+&nbsp;<br>
+If&nbsp;ctatime&nbsp;is&nbsp;unspecified,&nbsp;returns&nbsp;ETA&nbsp;based&nbsp;on&nbsp;the&nbsp;system's&nbsp;clock,<br>
+otherwise,&nbsp;matches&nbsp;difference&nbsp;against&nbsp;specified&nbsp;time.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>delayed</strong> = False</dl>
+
+<dl><dt><strong>destination</strong> = ''</dl>
+
+<dl><dt><strong>distance_to_stop</strong> = 0</dl>
+
+<dl><dt><strong>mins_to_arrival_at_init</strong> = 0</dl>
+
+<dl><dt><strong>predicted_eta</strong> = None</dl>
+
+<dl><dt><strong>prediction_type</strong> = ''</dl>
+
+<dl><dt><strong>route</strong> = ''</dl>
+
+<dl><dt><strong>route_dir</strong> = ''</dl>
+
+<dl><dt><strong>stop_id</strong> = 0</dl>
+
+<dl><dt><strong>stop_name</strong> = ''</dl>
+
+<dl><dt><strong>timestamp</strong> = None</dl>
+
+<dl><dt><strong>vehicle_id</strong> = 0</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SB_Service">class <strong>SB_Service</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Service&nbsp;bulletin&nbsp;data&nbsp;for&nbsp;bulletins&nbsp;that&nbsp;affect&nbsp;only&nbsp;a&nbsp;certain&nbsp;subset<br>
+of&nbsp;the&nbsp;system<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="SB_Service-__init__"><strong>__init__</strong></a>(self, stop_name, route<font color="#909090">=None</font>, direction<font color="#909090">=None</font>, stop_num<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="SB_Service-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>direction</strong> = ''</dl>
+
+<dl><dt><strong>route</strong> = ''</dl>
+
+<dl><dt><strong>stop_name</strong> = 0</dl>
+
+<dl><dt><strong>stop_num</strong> = 0</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Service_Bulletin">class <strong>Service_Bulletin</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>"<br>
+Contains&nbsp;a&nbsp;service&nbsp;bulletin&nbsp;object.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Service_Bulletin-__init__"><strong>__init__</strong></a>(self, name, subject, detail, brief, priority, affected_services<font color="#909090">=[]</font>)</dt></dl>
+
+<dl><dt><a name="Service_Bulletin-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Service_Bulletin-append"><strong>append</strong></a>(self, stop_name, route<font color="#909090">=None</font>, direction<font color="#909090">=None</font>, stop_num<font color="#909090">=None</font>)</dt><dd><tt>Appends&nbsp;an&nbsp;<a href="#SB_Service">SB_Service</a>&nbsp;object&nbsp;to&nbsp;this&nbsp;bulletin</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>affected_services</strong> = []</dl>
+
+<dl><dt><strong>brief</strong> = ''</dl>
+
+<dl><dt><strong>detail</strong> = ''</dl>
+
+<dl><dt><strong>name</strong> = ''</dl>
+
+<dl><dt><strong>priority</strong> = ''</dl>
+
+<dl><dt><strong>subject</strong> = ''</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Stop">class <strong>Stop</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Holds&nbsp;information&nbsp;about&nbsp;a&nbsp;stop<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Stop-__init__"><strong>__init__</strong></a>(self, stop_id, stop_name, lat, long)</dt><dd><tt>Creates&nbsp;a&nbsp;Route&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="Stop-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>String&nbsp;representation&nbsp;of&nbsp;a&nbsp;<a href="#Stop">Stop</a>&nbsp;object</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>lat</strong> = 0.0</dl>
+
+<dl><dt><strong>long</strong> = 0.0</dl>
+
+<dl><dt><strong>stop_id</strong> = 0</dl>
+
+<dl><dt><strong>stop_name</strong> = ''</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Vehicle">class <strong>Vehicle</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>An&nbsp;object&nbsp;that&nbsp;holds&nbsp;information&nbsp;about&nbsp;a&nbsp;vehicle.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Vehicle-__init__"><strong>__init__</strong></a>(self, vehicle_id, timestamp, lat, long, heading, pattern_id, pattern_distance, dest, route, delayed<font color="#909090">=False</font>)</dt><dd><tt>Constructor</tt></dd></dl>
+
+<dl><dt><a name="Vehicle-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>Thrilling&nbsp;string&nbsp;creation&nbsp;stuff!&nbsp;Just&nbsp;dumps&nbsp;the&nbsp;information&nbsp;out&nbsp;in&nbsp;a&nbsp;readable&nbsp;manner.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>delayed</strong> = False</dl>
+
+<dl><dt><strong>dest</strong> = ''</dl>
+
+<dl><dt><strong>heading</strong> = 0</dl>
+
+<dl><dt><strong>lat</strong> = 0.0</dl>
+
+<dl><dt><strong>long</strong> = 0.0</dl>
+
+<dl><dt><strong>pattern</strong> = None</dl>
+
+<dl><dt><strong>pattern_distance</strong> = 0</dl>
+
+<dl><dt><strong>pattern_id</strong> = 0</dl>
+
+<dl><dt><strong>route</strong> = ''</dl>
+
+<dl><dt><strong>timestamp</strong> = None</dl>
+
+<dl><dt><strong>vehicle_id</strong> = 0</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ctabustracker">class <strong>ctabustracker</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Creates&nbsp;an&nbsp;object&nbsp;that&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;query&nbsp;Bus&nbsp;Tracker&nbsp;information<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ctabustracker-__init__"><strong>__init__</strong></a>(self, api_key, api_url<font color="#909090">=None</font>)</dt><dd><tt>Initializes&nbsp;the&nbsp;API&nbsp;key&nbsp;for&nbsp;the&nbsp;CTA&nbsp;bus&nbsp;tracker.<br>
+This&nbsp;module&nbsp;will&nbsp;not&nbsp;work&nbsp;without&nbsp;a&nbsp;valid&nbsp;key.<br>
+If&nbsp;you&nbsp;do&nbsp;not&nbsp;have&nbsp;an&nbsp;API&nbsp;key,&nbsp;you&nbsp;can&nbsp;request&nbsp;one&nbsp;from<br>
+<a href="http://www.transitchicago.com/developers/bustracker.aspx">http://www.transitchicago.com/developers/bustracker.aspx</a><br>
+&nbsp;<br>
+api_url&nbsp;is&nbsp;the&nbsp;base&nbsp;API&nbsp;url&nbsp;to&nbsp;access.&nbsp;If&nbsp;it&nbsp;is&nbsp;not<br>
+specified,&nbsp;the&nbsp;default&nbsp;is&nbsp;used:<br>
+<a href="http://www.ctabustracker.com/bustime/api/v1/">http://www.ctabustracker.com/bustime/api/v1/</a></tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getbulletins_route"><strong>getbulletins_route</strong></a>(self, *routes)</dt><dd><tt>Gets&nbsp;bulletins&nbsp;related&nbsp;to&nbsp;routes.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getbulletins_stops"><strong>getbulletins_stops</strong></a>(self, *stopids)</dt><dd><tt>Gets&nbsp;bulletins&nbsp;related&nbsp;to&nbsp;given&nbsp;stop&nbsp;ids.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-geteta_from_prediction"><strong>geteta_from_prediction</strong></a>(self, prediction, use_cta_clock<font color="#909090">=True</font>)</dt><dd><tt>Returns&nbsp;the&nbsp;time&nbsp;(in&nbsp;minutes)&nbsp;that&nbsp;a&nbsp;vehicle&nbsp;is<br>
+expected&nbsp;to&nbsp;arrive.<br>
+&nbsp;<br>
+Requires&nbsp;a&nbsp;<a href="#Prediction">Prediction</a>&nbsp;object&nbsp;as&nbsp;a&nbsp;parameter,&nbsp;and<br>
+calculates&nbsp;the&nbsp;difference&nbsp;agains&nbsp;the&nbsp;CTA's&nbsp;clock&nbsp;if<br>
+use_cta_clock&nbsp;is&nbsp;True.&nbsp;&nbsp;If&nbsp;it&nbsp;is&nbsp;False,&nbsp;it&nbsp;uses&nbsp;the&nbsp;&nbsp;local&nbsp;system's<br>
+clock.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getpatterns_pid"><strong>getpatterns_pid</strong></a>(self, *patternids)</dt><dd><tt>Returns&nbsp;patterns&nbsp;given&nbsp;a&nbsp;list&nbsp;of&nbsp;up&nbsp;to&nbsp;10&nbsp;pattern&nbsp;ids</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getpatterns_rt"><strong>getpatterns_rt</strong></a>(self, route, direction)</dt><dd><tt>Returns&nbsp;a&nbsp;single&nbsp;pattern&nbsp;given&nbsp;a&nbsp;route&nbsp;and&nbsp;direction</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getpredictions_stop"><strong>getpredictions_stop</strong></a>(self, *stop_ids)</dt><dd><tt>Returns&nbsp;predictions&nbsp;for&nbsp;the&nbsp;given&nbsp;stop_ids.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getpredictions_vehicle"><strong>getpredictions_vehicle</strong></a>(self, *vehicle_ids)</dt><dd><tt>Returns&nbsp;predictions&nbsp;for&nbsp;the&nbsp;given&nbsp;vehicle_ids</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getroute_directions"><strong>getroute_directions</strong></a>(self, route)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;directions&nbsp;a&nbsp;given&nbsp;route&nbsp;can&nbsp;go</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getroute_stops"><strong>getroute_stops</strong></a>(self, route, direction)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;<a href="#Stop">Stop</a>&nbsp;objects&nbsp;on&nbsp;a&nbsp;given&nbsp;route<br>
+direction&nbsp;must&nbsp;be&nbsp;a&nbsp;string&nbsp;specifing&nbsp;the&nbsp;direction&nbsp;of&nbsp;the&nbsp;bus.<br>
+&nbsp;<br>
+The&nbsp;returned&nbsp;list&nbsp;is&nbsp;unordered.&nbsp;Ordering&nbsp;is&nbsp;accomplished<br>
+by&nbsp;constructing&nbsp;a&nbsp;pattern.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getroutes"><strong>getroutes</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;dict&nbsp;of&nbsp;available&nbsp;routes</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-gettime"><strong>gettime</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;time&nbsp;(as&nbsp;a&nbsp;time&nbsp;object)&nbsp;<br>
+as&nbsp;according&nbsp;to&nbsp;the&nbsp;BusTracker&nbsp;system.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getvehicles_rt"><strong>getvehicles_rt</strong></a>(self, *routes)</dt><dd><tt>Retrieves&nbsp;the&nbsp;vehicles&nbsp;available&nbsp;on&nbsp;the&nbsp;specified&nbsp;routes.<br>
+Up&nbsp;to&nbsp;10&nbsp;routes&nbsp;can&nbsp;be&nbsp;specified.</tt></dd></dl>
+
+<dl><dt><a name="ctabustracker-getvehicles_vid"><strong>getvehicles_vid</strong></a>(self, *vehicleids)</dt><dd><tt>Retrieves&nbsp;bus&nbsp;locations&nbsp;for&nbsp;the&nbsp;given&nbsp;bus&nbsp;IDs.&nbsp;&nbsp;vehicle_ids<br>
+can&nbsp;either&nbsp;be&nbsp;a&nbsp;single&nbsp;integer&nbsp;(for&nbsp;one&nbsp;bus)&nbsp;or&nbsp;a&nbsp;list&nbsp;of&nbsp;up&nbsp;to<br>
+10&nbsp;elements.</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-convert_time"><strong>convert_time</strong></a>(timestring)</dt><dd><tt>Converts&nbsp;a&nbsp;CTA&nbsp;time&nbsp;stamp&nbsp;from&nbsp;XML&nbsp;into&nbsp;a<br>
+time_struct</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__author__</strong> = 'Chris Swingler'<br>
+<strong>__email__</strong> = 'chris@chrisswingler.com'<br>
+<strong>__status__</strong> = 'Development'<br>
+<strong>log</strong> = &lt;logging.Logger instance at 0x6b5198&gt;</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#7799ee">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Author</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#7799ee"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Chris&nbsp;Swingler</td></tr></table>
+</body></html>

@@ -2,6 +2,10 @@
 TODO
 ====
 
+ * Sanitize directions! If you don't enter the expected case and spacing, 
+   you'll get nothing!
+ * In the Service_Bulletin object, add a method to strip the brief result of
+   any HTML that may be passed along.
  * Fix Exceptions
  * Implement handling of errors from the API
  * Documentation
@@ -10,7 +14,8 @@ TODO
    EXCEPT the name of the stop?
  * Testing against the API, as the documentation doesn't match up
    with the results often.
- * Logging: More performance and debugging logging as necessary
+ * Logging: More performance and debugging logging as necessary, allow 
+   adjustment
  * Error handling: Errors returned from the CTA API will be silently ignored or
    throw an unexpected exception, should pass those out as necessary
  * Caching: Shouldn't make a request against the API more than once every 60 
