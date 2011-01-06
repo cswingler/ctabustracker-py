@@ -26,8 +26,12 @@ TODO
  * Coherency: There's some weirdness in the BusTracker API that exists here,
    particularly with terse ("A" for arrival and "D" for departure) or verbose
    ("West Bound") string handling. This should probably be more consistent.
- * __str__() methods: Ugly.
  * Exceptions: a mess.
  * General cleanup: It's been a while since I've written anything in Python, a
    lot of this code is just a mess.
 
+=======
+TODONE!
+=======
+
+ * __str__() methods: Ugly.
