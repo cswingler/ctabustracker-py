@@ -902,18 +902,22 @@ class Prediction:
         return
 
     def __str__(self):
-        return "Prediction generated at: " + time.asctime(self.timestamp) + "\n" +\
-                "Type: " + self.prediction_type + "\n" +\
-                "Route: " + str(self.route) + "\n" +\
-                "Direction: " + str(self.route_dir) + "\n" +\
-                "Route destination: " + self.destination + "\n" +\
-                "Stop number: " + str(self.stop_id) + "\n" +\
-                "Stop name: " + self.stop_name + "\n" +\
-                "Vehicle number:  " + str(self.vehicle_id) + "\n" +\
-                "Distance away: " + str(self.distance_to_stop) + "\n" +\
-                "Estimated time of arrival: " + time.asctime(self.predicted_eta) + "\n" +\
-                "Minutes to arrival (at instantiation): " + str(self.mins_to_arrival_at_init)
-    
+        return "Prediction generated at: %s  \
+                \nType: %s \
+                \nRoute: %s  \
+                \nDirection: %s \
+                \nRoute destination: %s \
+                \nStop number: %s \
+                \nStop name: %s \
+                \nVehicle number: %s  \
+                \nDistance away: %s \
+                \nEstimated time of arrival: %s \
+                \nMinutes to arrival (at instantiation): %s" \
+                % (time.asctime(self.timestamp), self.prediction_type, \
+                   self.route, self.route_dir, self.destination, self.stop_id,\
+                   self.stop_name, self.vehicle_id, self.distance_to_stop,\
+                   time.asctime(self.predicted_eta), \
+                   self.mins_to_arrival_at_init)
 
 class Service_Bulletin:
     """"
@@ -968,15 +972,16 @@ class Service_Bulletin:
         return
 
     def __str__(self):
-        return_str = "SERVICE BULLETIN:\n" +\
-                "Name: " + str(self.name) + "\n" +\
-                "Subject: " + str(self.subject) + "\n" +\
-                "Detail: " + str(self.detail) + "\n" +\
-                "Brief: " + str(self.brief) + "\n" +\
-                "Priority: " + str(self.priority) + "\n"
+        return_str = "SERVICE BULLETIN: \
+                \nName: %s \
+                \nSubject: %s \
+                \nDetail: %s \
+                \nBrief: %s \
+                \nPriority: %s" % (self.name, self.subject, self.detail, \
+                                   self.brief, self.priority)
 
         for service in self.affected_services:
-            return_str += (str(service))
+            return_str += "\n\t%s" % service
             
         return return_str
 
@@ -1022,11 +1027,11 @@ class SB_Service:
         self.stop_name = str(stop_name)
 
     def __str__(self):
-        return "AFFECTED SERVICE:\n" +\
-                "Route number: " + str(self.route) + "\n" +\
-                "Route direction: " + str(self.direction) + "\n" +\
-                "Stop number: " + str(self.stop_num)  + "\n" +\
-                "Stop name: " + str(self.stop_name) + "\n"
+        return "AFFECTED SERVICE:" +\
+                "\nRoute number: %s \
+                \nRoute direction: %s \
+                \nStop number: %s \
+                \nStop name: %s" % (self.route, self.direction, self.stop_num, self.stop_name)
 
 # EXCEPTION DEFINITIONS
 
