@@ -675,17 +675,19 @@ class Vehicle:
         """
         Thrilling string creation stuff! Just dumps the information out in a readable manner.
         """
-        # TODO: This is not pythonic, or even readable!
-        return "Bus number: " + str(self.vehicle_id) + \
-        "\nTime of update: " + str(time.asctime(self.timestamp)) + \
-        "\nLatitude: " + str(self.lat) + \
-        "\nLongitude: " + str(self.long) + \
-        "\nHeading: " + str(self.heading) + \
-        "\nPattern_ID: " + str(self.pattern_id) + \
-        "\nDistance traveled: " + str(self.pattern_distance) + \
-        "\nRoute: "+ str(self.route) + \
-        "\nDestination: "+ str(self.dest) + \
-        "\nDelayed?: "+ str(self.delayed) 
+        return "Bus number: %s \
+                \nTime of update: %s \
+                \nLatitude: %s \
+                \nLongitude: %s \
+                \nHeading: %s \
+                \nPattern_ID: %s \
+                \nDistance traveled: %s \
+                \nRoute: %s \
+                \nDestination: %s  \
+                \nDelayed?: %s " \
+                % (self.vehicle_id, time.asctime(self.timestamp), self.lat, \
+                   self.long, self.heading, self.pattern_id, \
+                   self.pattern_distance, self.route, self.dest, self.delayed)
 
 class Stop:
     """
@@ -720,10 +722,8 @@ class Stop:
         String representation of a Stop object
         """
 
-        return "Stop #: " + str(self.stop_id) + " | " + \
-                "Stop name: " + str(self.stop_name) + " | " + \
-                "Latitude: " + str(self.lat) + " | " + \
-                "Longitude: " + str(self.long)
+        return "Stop #: %s  | Stop name: %s | Latitude: %s  | Longitude: %s "\
+                % (self.stop_id, self.stop_name, self.lat, self.long)
 
 class Pattern:
     """
@@ -766,12 +766,12 @@ class Pattern:
 
     def __str__(self):
 
-        point_str = "Pattern ID: " + str(self.pattern_id) + \
-                "\nLength: " + str(self.length) + \
-                "\nDirection: " + str(self.direction) + \
-                "\nPoints:\n"
+        point_str = "Pattern ID: %s \
+                \nLength: %s \
+                \nDirection: %s \
+                \nPoints: \n" % (self.pattern_id, self.length, self.direction)
         for point in self.points:
-            point_str += str(point)
+            point_str += "\t%s\n" % point
 
         return point_str
 
@@ -902,8 +902,7 @@ class Prediction:
         return
 
     def __str__(self):
-        return "PREDICTION:\n"+\
-                "Prediction generated at: " + time.asctime(self.timestamp) + "\n" +\
+        return "Prediction generated at: " + time.asctime(self.timestamp) + "\n" +\
                 "Type: " + self.prediction_type + "\n" +\
                 "Route: " + str(self.route) + "\n" +\
                 "Direction: " + str(self.route_dir) + "\n" +\

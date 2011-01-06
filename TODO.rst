@@ -2,6 +2,8 @@
 TODO
 ====
 
+ * Don't sit on HTTP transactions forever! If they don't work after 10 
+   seconds or so, throw an exception.
  * Sanitize directions! If you don't enter the expected case and spacing, 
    you'll get nothing!
  * In the Service_Bulletin object, add a method to strip the brief result of
